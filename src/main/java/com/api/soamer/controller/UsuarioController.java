@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-
 @RestController
 @CrossOrigin(maxAge = 3600)
 @RequestMapping("/v1/soamer/usuario")
@@ -25,7 +24,6 @@ public class UsuarioController {
     @PostMapping
     public ResponseEntity<Object> createUsuario(@RequestBody UsuarioModel usuarioModel) {
         try {
-
             if (Validators.emailValido(usuarioModel.getEmailUsuario())) {
                 if (!usuarioRepository.existsByEmailUsuario(usuarioModel.getEmailUsuario())) {
                     if (!usuarioRepository.existsByCpfUsuario(usuarioModel.getCpfUsuario())) {
@@ -41,8 +39,6 @@ public class UsuarioController {
             }
 
             return Error.error400("E-mail invalido");
-
-
         } catch (Exception e) {
             return Error.error500(e);
         }
