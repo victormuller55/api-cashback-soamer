@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Locale;
+
 @RestController
 @CrossOrigin(maxAge = 3600)
 @RequestMapping("/v1/soamer/usuario")
@@ -44,4 +46,25 @@ public class UsuarioController {
         }
     }
 
+    @GetMapping
+    public ResponseEntity<Object> entrarUsuario(@RequestParam(name = "email") String emailUsuario, @RequestParam String senha) {
+        try {
+            if (Validators.emailValido(emailUsuario)) {
+                if (usuarioRepository.existsByEmailUsuario(emailUsuario)) {
+                    UsuarioModel usuario = usuarioRepository.findByEmailUsuario(emailUsuario);
+                    if(usuario.getSenhaUsuario().toLowerCase(Locale.ROOT).equals(senha.toLowerCase(Locale.ROOT))){
+                        return Success.success200(usuario);
+                    }
+
+                    return Error.error400("Senha incorreta");
+                }
+
+                return Error.error400("E-mail nao cadastrado");
+            }
+
+            return Error.error400("E-mail invalido");
+        } catch (Exception e) {
+            return Error.error500(e);
+        }
+    }
 }
