@@ -13,16 +13,16 @@ public class UsuarioModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonProperty("id_usuario")
     private Integer idUsuario;
-
     @JsonProperty("nome_usuario")
     private String nomeUsuario;
-
     @JsonProperty("email_usuario")
     private String emailUsuario;
-
     @JsonProperty("cpf_usuario")
     private String cpfUsuario;
-
+    @JsonProperty("pontos_usuario")
+    private int pontosUsuario;
+    @JsonProperty("pontos_pendentes_usuario")
+    private int pontosPendentesUsuario;
     @JsonProperty("senha_usuario")
     private String senhaUsuario;
 
@@ -31,6 +31,8 @@ public class UsuarioModel {
 
     public UsuarioModel() {
         dataUsuario = new Date();
+        pontosUsuario = 0;
+        pontosPendentesUsuario = 0;
     }
 
     public Integer getIdUsuario() {
@@ -63,6 +65,22 @@ public class UsuarioModel {
 
     public void setCpfUsuario(String cpfUsuario) {
         this.cpfUsuario = cpfUsuario;
+    }
+
+    public int getPontosUsuario() {
+        return pontosUsuario;
+    }
+
+    public void setPontosUsuario(int pontosUsuario) {
+        this.pontosUsuario = pontosUsuario;
+    }
+
+    public int getPontosPendentesUsuario() {
+        return pontosPendentesUsuario;
+    }
+
+    public void setPontosPendentesUsuario(int pontosPendentesUsuario) {
+        this.pontosPendentesUsuario = pontosPendentesUsuario;
     }
 
     public String getSenhaUsuario() {
