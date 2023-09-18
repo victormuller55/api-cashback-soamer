@@ -11,7 +11,6 @@ public class ErrorModel {
         this.erro = erro.getMessage();
     }
 
-
     public ErrorModel(String mensagem, String tipo) {
         this.tipo = tipo;
         this.mensagem = mensagem;

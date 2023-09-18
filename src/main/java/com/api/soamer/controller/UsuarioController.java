@@ -1,5 +1,6 @@
 package com.api.soamer.controller;
 
+import com.api.soamer.model.HomeModel;
 import com.api.soamer.model.UsuarioModel;
 import com.api.soamer.repository.UsuarioRepository;
 import com.api.soamer.responses.Error;
@@ -52,11 +53,35 @@ public class UsuarioController {
             if (Validators.emailValido(emailUsuario)) {
                 if (usuarioRepository.existsByEmailUsuario(emailUsuario)) {
                     UsuarioModel usuario = usuarioRepository.findByEmailUsuario(emailUsuario);
-                    if(usuario.getSenhaUsuario().toLowerCase(Locale.ROOT).equals(senha.toLowerCase(Locale.ROOT))){
+                    if (usuario.getSenhaUsuario().toLowerCase(Locale.ROOT).equals(senha.toLowerCase(Locale.ROOT))) {
                         return Success.success200(usuario);
                     }
 
                     return Error.error400("Senha incorreta");
+                }
+
+                return Error.error400("E-mail nao cadastrado");
+            }
+
+            return Error.error400("E-mail invalido");
+        } catch (Exception e) {
+            return Error.error500(e);
+        }
+    }
+
+    @GetMapping(path = "/home")
+    public ResponseEntity<Object> home(@RequestParam(name = "email") String emailUsuario) {
+        try {
+            if (Validators.emailValido(emailUsuario)) {
+                if (usuarioRepository.existsByEmailUsuario(emailUsuario)) {
+
+                    HomeModel homeModel = new HomeModel();
+                    UsuarioModel usuarioModel = usuarioRepository.findByEmailUsuario(emailUsuario);
+
+                    homeModel.setPontosUsuario(usuarioModel.getPontosUsuario());
+                    homeModel.setValorPix(usuarioModel.getPontosUsuario());
+
+                    return Success.success200(homeModel);
                 }
 
                 return Error.error400("E-mail nao cadastrado");

@@ -25,7 +25,6 @@ public class UsuarioModel {
     private int pontosPendentesUsuario;
     @JsonProperty("senha_usuario")
     private String senhaUsuario;
-
     @JsonProperty("data_usuario")
     private Date dataUsuario;
 
