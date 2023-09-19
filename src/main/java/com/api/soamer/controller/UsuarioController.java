@@ -79,6 +79,7 @@ public class UsuarioController {
                     UsuarioModel usuarioModel = usuarioRepository.findByEmailUsuario(emailUsuario);
 
                     homeModel.setPontosUsuario(usuarioModel.getPontosUsuario());
+                    homeModel.setPontosPendentesUsuario(usuarioModel.getPontosPendentesUsuario());
                     homeModel.setValorPix(usuarioModel.getPontosUsuario());
 
                     return Success.success200(homeModel);

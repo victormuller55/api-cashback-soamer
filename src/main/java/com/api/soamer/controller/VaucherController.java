@@ -110,4 +110,56 @@ public class VaucherController {
             return Error.error500(e);
         }
     }
+
+    @GetMapping(path = "/promocao")
+    public ResponseEntity<Object> getVaucherListPromotion() {
+        try {
+
+            List<VaucherModel> vaucherEnviados = new ArrayList<>();
+            Date dataAtual = new Date();
+
+            for (VaucherModel vaucher : vaucherRepository.findAll()) {
+                if (dataAtual.toInstant().isAfter(vaucher.getDataComecoVaucher().toInstant()) && dataAtual.toInstant().isBefore(vaucher.getDataFinalVaucher().toInstant())) {
+                    if(vaucher.getDescontoVaucher() > 0) {
+                        vaucherEnviados.add(vaucher);
+                    }
+                }
+            }
+
+            if (!vaucherEnviados.isEmpty()) {
+                return Success.success200(vaucherEnviados);
+            }
+
+            return Success.success200(vaucherEnviados);
+
+        } catch (Exception e) {
+            return Error.error500(e);
+        }
+    }
+
+    @GetMapping(path = "/trocados")
+    public ResponseEntity<Object> getVaucherListTrocados() {
+        try {
+
+            List<VaucherModel> vaucherEnviados = new ArrayList<>();
+            Date dataAtual = new Date();
+
+            for (VaucherModel vaucher : vaucherRepository.findAll()) {
+                if (dataAtual.toInstant().isAfter(vaucher.getDataComecoVaucher().toInstant()) && dataAtual.toInstant().isBefore(vaucher.getDataFinalVaucher().toInstant())) {
+                    if(vaucher.getDescontoVaucher() > 0) {
+                        vaucherEnviados.add(vaucher);
+                    }
+                }
+            }
+
+            if (!vaucherEnviados.isEmpty()) {
+                return Success.success200(vaucherEnviados);
+            }
+
+            return Error.error400("Não foi encontrado nenhum vaucher.");
+
+        } catch (Exception e) {
+            return Error.error500(e);
+        }
+    }
 }
