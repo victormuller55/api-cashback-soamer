@@ -8,10 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.api.soamer.util.Formatters.formatDDMMYYYYHHMMToDate;
 
@@ -91,7 +89,7 @@ public class VaucherController {
                 VaucherModel vaucher = vaucherFound.get();
                 vaucher.setDescontoVaucher(desconto);
 
-                if(desconto > 0) {
+                if (desconto > 0) {
                     vaucher.setPontosVaucher(vaucher.getPontosCheioVaucher() - desconto);
                     vaucherRepository.save(vaucher);
 
@@ -120,7 +118,7 @@ public class VaucherController {
 
             for (VaucherModel vaucher : vaucherRepository.findAll()) {
                 if (dataAtual.toInstant().isAfter(vaucher.getDataComecoVaucher().toInstant()) && dataAtual.toInstant().isBefore(vaucher.getDataFinalVaucher().toInstant())) {
-                    if(vaucher.getDescontoVaucher() > 0) {
+                    if (vaucher.getDescontoVaucher() > 0) {
                         vaucherEnviados.add(vaucher);
                     }
                 }
@@ -138,19 +136,16 @@ public class VaucherController {
     }
 
     @GetMapping(path = "/trocados")
-    public ResponseEntity<Object> getVaucherListTrocados() {
+    public ResponseEntity<Object> getTop10VaucherTrocados() {
         try {
-
-            List<VaucherModel> vaucherEnviados = new ArrayList<>();
+            List<VaucherModel> vaucherEnviados;
             Date dataAtual = new Date();
 
-            for (VaucherModel vaucher : vaucherRepository.findAll()) {
-                if (dataAtual.toInstant().isAfter(vaucher.getDataComecoVaucher().toInstant()) && dataAtual.toInstant().isBefore(vaucher.getDataFinalVaucher().toInstant())) {
-                    if(vaucher.getDescontoVaucher() > 0) {
-                        vaucherEnviados.add(vaucher);
-                    }
-                }
-            }
+            List<VaucherModel> vouchersValidos = vaucherRepository.findAll().stream()
+                    .filter(vaucher -> dataAtual.toInstant().isAfter(vaucher.getDataComecoVaucher().toInstant()) && dataAtual.toInstant().isBefore(vaucher.getDataFinalVaucher().toInstant()))
+                    .sorted(Comparator.comparingInt(VaucherModel::getTrocado).reversed()).toList();
+
+            vaucherEnviados = vouchersValidos.stream().limit(10).collect(Collectors.toList());
 
             if (!vaucherEnviados.isEmpty()) {
                 return Success.success200(vaucherEnviados);
@@ -162,4 +157,5 @@ public class VaucherController {
             return Error.error500(e);
         }
     }
+
 }
