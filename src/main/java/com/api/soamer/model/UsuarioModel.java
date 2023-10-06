@@ -8,7 +8,6 @@ import java.util.Date;
 @Entity
 @Table(name = "tbl_usuario")
 public class UsuarioModel {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonProperty("id_usuario")

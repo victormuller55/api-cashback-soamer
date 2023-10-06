@@ -1,6 +1,10 @@
 package com.api.soamer.controller;
 
+import com.api.soamer.model.ExtratoModel;
+import com.api.soamer.model.UsuarioModel;
 import com.api.soamer.model.VaucherModel;
+import com.api.soamer.repository.ExtratoRepository;
+import com.api.soamer.repository.UsuarioRepository;
 import com.api.soamer.repository.VaucherRepository;
 import com.api.soamer.responses.Error;
 import com.api.soamer.responses.Success;
@@ -19,9 +23,15 @@ import static com.api.soamer.util.Formatters.formatDDMMYYYYHHMMToDate;
 public class VaucherController {
     @Autowired
     VaucherRepository vaucherRepository;
+    @Autowired
+    UsuarioRepository usuarioRepository;
+    @Autowired
+    ExtratoRepository extratoRepository;
 
-    public VaucherController(VaucherRepository vaucherRepository) {
+    public VaucherController(VaucherRepository vaucherRepository, ExtratoRepository extratoRepository, UsuarioRepository usuarioRepository) {
         this.vaucherRepository = vaucherRepository;
+        this.extratoRepository = extratoRepository;
+        this.usuarioRepository = usuarioRepository;
     }
 
     @PostMapping
@@ -156,6 +166,52 @@ public class VaucherController {
         } catch (Exception e) {
             return Error.error500(e);
         }
+    }
+
+    @GetMapping(path = "/trocar")
+    public ResponseEntity<Object> trocarVaucher(@RequestParam(name = "id_usuario") Integer idUsuario, @RequestParam(name = "id_vaucher") Integer idVaucher) {
+        try {
+
+            if (idUsuario != null && idVaucher != null) {
+
+                Optional<VaucherModel> vaucherModel = vaucherRepository.findById(idVaucher);
+                Optional<UsuarioModel> usuarioModel = usuarioRepository.findById(idUsuario);
+
+                if (vaucherModel.isPresent()) {
+                    if (usuarioModel.isPresent()) {
+                        if (usuarioModel.get().getPontosUsuario() >= vaucherModel.get().getPontosVaucher()) {
+
+                            usuarioModel.get().setPontosUsuario(usuarioModel.get().getPontosUsuario() - vaucherModel.get().getPontosVaucher());
+
+                            usuarioRepository.save(usuarioModel.get());
+                            extratoRepository.save(getExtratoModel(idUsuario, idVaucher, vaucherModel));
+
+                            return Success.success200("0000-0000-0000-0000-0000");
+
+                        }
+                        return Error.error400("Saldo insuficiente");
+                    }
+                    return Error.error400("Não foi encontrado nenhum usuario com o ID informado");
+                }
+                return Error.error400("Não foi encontrado nenhum vaucher com o ID informado");
+            }
+            return Error.error400("Os parametros são obrigatórios");
+
+        } catch (Exception e) {
+            return Error.error500(e);
+        }
+    }
+
+    private static ExtratoModel getExtratoModel(Integer idUsuario, Integer idVaucher, Optional<VaucherModel> vaucherModel) {
+        ExtratoModel extratoModel = new ExtratoModel();
+        extratoModel.setTituloExtrato("Troca por vaucher");
+        extratoModel.setDescricaoExtrato("Troca de pontos realizada - " + vaucherModel.get().getTituloVaucher());
+        extratoModel.setEntradaExtrato(false);
+        extratoModel.setPontosExtrato(vaucherModel.get().getPontosVaucher());
+        extratoModel.setDataExtrato(new Date());
+        extratoModel.setIdUsuario(idUsuario);
+        extratoModel.setIdVaucher(idVaucher);
+        return extratoModel;
     }
 
 }
