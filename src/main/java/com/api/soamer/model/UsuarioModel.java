@@ -26,6 +26,10 @@ public class UsuarioModel {
     private String senhaUsuario;
     @JsonProperty("data_usuario")
     private Date dataUsuario;
+    @JsonProperty("id_concessionaria")
+    private Integer idConcessionaria;
+    @JsonProperty("nome_concessionaria")
+    private String nomeConcessionaria;
 
     public UsuarioModel() {
         dataUsuario = new Date();
@@ -95,5 +99,20 @@ public class UsuarioModel {
 
     public void setDataUsuario(Date dataUsuario) {
         this.dataUsuario = dataUsuario;
+    }
+
+    public Integer getIdConcessionaria() {
+        return idConcessionaria;
+    }
+    public void setIdConcessionaria(Integer idConcessionaria) {
+        this.idConcessionaria = idConcessionaria;
+    }
+
+    public String getNomeConcessionaria() {
+        return nomeConcessionaria;
+    }
+
+    public void setNomeConcessionaria(String nomeConcessionaria) {
+        this.nomeConcessionaria = nomeConcessionaria;
     }
 }

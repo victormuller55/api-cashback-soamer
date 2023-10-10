@@ -31,7 +31,6 @@ public class UsuarioController {
                 if (!usuarioRepository.existsByEmailUsuario(usuarioModel.getEmailUsuario())) {
                     if (!usuarioRepository.existsByCpfUsuario(usuarioModel.getCpfUsuario())) {
                         usuarioRepository.save(usuarioModel);
-
                         return Success.success200(usuarioModel);
                     }
 
@@ -89,6 +88,15 @@ public class UsuarioController {
             }
 
             return Error.error400("E-mail invalido");
+        } catch (Exception e) {
+            return Error.error500(e);
+        }
+    }
+
+    @GetMapping(path = "/todos")
+    public ResponseEntity<Object> carregarUsuario() {
+        try {
+            return Success.success200(usuarioRepository.findAll());
         } catch (Exception e) {
             return Error.error500(e);
         }

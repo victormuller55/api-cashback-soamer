@@ -26,4 +26,45 @@ public class Validators {
             Matcher matcher = pattern.matcher(emailUsuario);
             return matcher.matches();
     }
+
+    public static boolean cnpjValido(String cnpj) {
+        cnpj = cnpj.replaceAll("[^0-9]", "");
+
+        if (cnpj.length() != 14) {
+            return false;
+        }
+
+        if (cnpj.matches("(\\d)\\1*")) {
+            return false;
+        }
+
+        int soma = 0;
+        int peso = 2;
+        for (int i = 11; i >= 0; i--) {
+            int digito = Character.getNumericValue(cnpj.charAt(i));
+            soma += digito * peso;
+            peso++;
+            if (peso == 10) {
+                peso = 2;
+            }
+        }
+        int resto = soma % 11;
+        int digitoVerificador1 = (resto < 2) ? 0 : (11 - resto);
+
+        soma = 0;
+        peso = 2;
+        for (int i = 12; i >= 0; i--) {
+            int digito = Character.getNumericValue(cnpj.charAt(i));
+            soma += digito * peso;
+            peso++;
+            if (peso == 10) {
+                peso = 2;
+            }
+        }
+        resto = soma % 11;
+        int digitoVerificador2 = (resto < 2) ? 0 : (11 - resto);
+
+        return (digitoVerificador1 == Character.getNumericValue(cnpj.charAt(12)) &&
+                digitoVerificador2 == Character.getNumericValue(cnpj.charAt(13)));
+    }
 }
