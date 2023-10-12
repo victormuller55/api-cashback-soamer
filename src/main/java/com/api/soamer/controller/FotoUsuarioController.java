@@ -22,7 +22,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Optional;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/v1/soamer/usuario/foto")
@@ -48,9 +47,9 @@ public class FotoUsuarioController {
 
                 Optional<UsuarioModel> usuarioModel = usuarioRepository.findById(idUsuario);
 
-                if(usuarioModel.isPresent()) {
+                if (usuarioModel.isPresent()) {
 
-                    String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+                    String fileName = "image" + "_" + idUsuario + "_" + file.getOriginalFilename();
                     Path filePath = Paths.get(uploadPath, fileName);
                     Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
                     FotoUsuarioModel foto = new FotoUsuarioModel();
@@ -64,7 +63,7 @@ public class FotoUsuarioController {
                     usuarioRepository.save(usuarioModel.get());
 
                     return Success.success200("Ok");
-               }
+                }
 
                 return Error.error400("Usuario não encontrado");
             }
@@ -89,14 +88,17 @@ public class FotoUsuarioController {
 
                 if (path != null) {
                     Path filePath = Paths.get(uploadPath, path);
+
                     UrlResource resource = new UrlResource(filePath.toUri());
+
                     if (resource.exists() && resource.isReadable()) {
+
                         HttpHeaders headers = new HttpHeaders();
                         headers.setContentType(MediaType.IMAGE_PNG);
 
                         return ResponseEntity.ok().headers(headers).body(resource);
                     } else {
-                        return Error.error400("Resorse não encontrada");
+                        return Error.error400("Resourse não encontrada");
                     }
                 } else {
                     return Error.error400("Imagem não encontrada");

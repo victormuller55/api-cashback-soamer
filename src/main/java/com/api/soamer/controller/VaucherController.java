@@ -181,6 +181,8 @@ public class VaucherController {
                     if (usuarioModel.isPresent()) {
                         if (usuarioModel.get().getPontosUsuario() >= vaucherModel.get().getPontosVaucher()) {
 
+                            vaucherModel.get().setTrocado(vaucherModel.get().getTrocado() + 1);
+
                             usuarioModel.get().setPontosUsuario(usuarioModel.get().getPontosUsuario() - vaucherModel.get().getPontosVaucher());
 
                             usuarioRepository.save(usuarioModel.get());
