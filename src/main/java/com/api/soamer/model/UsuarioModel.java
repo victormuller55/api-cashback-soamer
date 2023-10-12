@@ -30,6 +30,8 @@ public class UsuarioModel {
     private Integer idConcessionaria;
     @JsonProperty("nome_concessionaria")
     private String nomeConcessionaria;
+    @JsonProperty("image_path")
+    private String imagePath;
 
     public UsuarioModel() {
         dataUsuario = new Date();
@@ -114,5 +116,13 @@ public class UsuarioModel {
 
     public void setNomeConcessionaria(String nomeConcessionaria) {
         this.nomeConcessionaria = nomeConcessionaria;
+    }
+
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
     }
 }
