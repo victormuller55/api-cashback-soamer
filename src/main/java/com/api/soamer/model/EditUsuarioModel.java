@@ -13,9 +13,6 @@ public class EditUsuarioModel {
     String email;
     @JsonProperty("senha")
     String senha;
-    @JsonProperty("id_concessionaria")
-    Integer idConcessionaria;
-
 
     public void setNome(String nome) {
         this.nome = nome;
@@ -57,11 +54,4 @@ public class EditUsuarioModel {
         return nome;
     }
 
-    public Integer getIdConcessionaria() {
-        return idConcessionaria;
-    }
-
-    public void setIdConcessionaria(Integer idConcessionaria) {
-        this.idConcessionaria = idConcessionaria;
-    }
 }

@@ -42,7 +42,7 @@ public class RecuperarSenhaController {
                     return Success.success200(numeroGerado);
                 }
 
-                return Error.error400("Usuario não encontrado");
+                return Error.error400("Usuario nao encontrado");
             }
 
             return Error.error400("E-mail invalido");

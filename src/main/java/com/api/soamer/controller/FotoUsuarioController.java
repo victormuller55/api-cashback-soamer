@@ -40,40 +40,38 @@ public class FotoUsuarioController {
     private String uploadPath;
 
     @PostMapping
-    public ResponseEntity<Object> uploadFoto(@RequestParam("file") MultipartFile file, @RequestParam(name = "id_usuario") Integer idUsuario) throws IOException {
+    public ResponseEntity<Object> uploadFoto(@RequestParam("file") MultipartFile file, @RequestParam(name = "id_usuario") Integer idUsuario) {
         try {
-
             if (!file.isEmpty()) {
+                Optional<UsuarioModel> usuarioModelOptional = usuarioRepository.findById(idUsuario);
 
-                Optional<UsuarioModel> usuarioModel = usuarioRepository.findById(idUsuario);
+                if (usuarioModelOptional.isPresent()) {
+                    UsuarioModel usuarioModel = usuarioModelOptional.get();
 
-                if (usuarioModel.isPresent()) {
+                    if (usuarioModel.getImagePath() != null) {
+                        Path previousImagePath = Paths.get(uploadPath, usuarioModel.getImagePath());
+                        Files.delete(previousImagePath);
+                    }
 
                     String fileName = "image" + "_" + idUsuario + "_" + file.getOriginalFilename();
                     Path filePath = Paths.get(uploadPath, fileName);
                     Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-                    FotoUsuarioModel foto = new FotoUsuarioModel();
 
-                    foto.setFilePath(fileName);
-                    foto.setIdUsuario(idUsuario);
-
-                    usuarioModel.get().setImagePath(fileName);
-
-                    fotoUsuarioRepository.save(foto);
-                    usuarioRepository.save(usuarioModel.get());
+                    usuarioModel.setImagePath(fileName);
+                    usuarioRepository.save(usuarioModel);
 
                     return Success.success200("Ok");
+                } else {
+                    return Error.error400("Usuário não encontrado");
                 }
-
-                return Error.error400("Usuario não encontrado");
+            } else {
+                return Error.error400("O arquivo está vazio");
             }
-
-            return Error.error400("O arquivo está vazio");
-
         } catch (Exception e) {
             return Error.error500(e);
         }
     }
+
 
     @GetMapping()
     public ResponseEntity<Object> getFoto(@RequestParam(name = "id_usuario") Integer idUsuario) {

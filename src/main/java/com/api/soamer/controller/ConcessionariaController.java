@@ -20,7 +20,6 @@ public class ConcessionariaController {
 
     @Autowired
     ConcessionariaRepository concessionariaRepository;
-
     @Autowired
     UsuarioRepository usuarioRepository;
 

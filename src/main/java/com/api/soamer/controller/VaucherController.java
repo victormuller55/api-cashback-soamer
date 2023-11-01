@@ -33,6 +33,7 @@ public class VaucherController {
         this.extratoRepository = extratoRepository;
         this.usuarioRepository = usuarioRepository;
     }
+    private final String uploadDirectory = "img/voucher/";
 
     @PostMapping
     public ResponseEntity<Object> createVaucher(@RequestBody VaucherModel vaucherModel) {
@@ -45,20 +46,43 @@ public class VaucherController {
                 if (!vaucherModel.getInfoVaucher().isEmpty()) {
                     if (!vaucherModel.getPontosCheioVaucher().equals(0)) {
 
+//                        if (!file.isEmpty()) {
+//                            if (vaucherModel.getImagePath() != null) {
+//                                Path previousImagePath = Paths.get(uploadDirectory, vaucherModel.getImagePath());
+//                                Files.delete(previousImagePath);
+//                            }
+//
+//                            String fileName = "image" + "_voucher_" + file.getOriginalFilename();
+//                            Path filePath = Paths.get(uploadDirectory, fileName);
+//                            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+//                            vaucherModel.setImagePath(fileName);
+//                            vaucherRepository.save(vaucherModel);
+//                         }
+//                        return Error.error400("O arquivo está vazio");
+
                         vaucherModel.setPontosVaucher(vaucherModel.getPontosCheioVaucher() - vaucherModel.getDescontoVaucher());
                         vaucherRepository.save(vaucherModel);
 
                         return Success.success200(vaucherModel);
+
                     }
-
                     return Error.error400("PontosCheiosVaucher não deve ser 0");
+
                 }
-
                 return Error.error400("InfoVaucher não deve ser vazio");
-            }
 
+            }
             return Error.error400("TituloVaucher não deve ser vazio");
 
+        } catch (Exception e) {
+            return Error.error500(e);
+        }
+    }
+
+    @PostMapping
+    public ResponseEntity<Object> postImageVoucher() {
+        try {
+            return Success.success200("");
         } catch (Exception e) {
             return Error.error500(e);
         }
@@ -193,11 +217,11 @@ public class VaucherController {
                         }
                         return Error.error400("Saldo insuficiente");
                     }
-                    return Error.error400("Não foi encontrado nenhum usuario com o ID informado");
+                    return Error.error400("Nao foi encontrado nenhum usuario com o ID informado");
                 }
-                return Error.error400("Não foi encontrado nenhum vaucher com o ID informado");
+                return Error.error400("Nao foi encontrado nenhum vaucher com o ID informado");
             }
-            return Error.error400("Os parametros são obrigatórios");
+            return Error.error400("Os parametros são obrigatOrios");
 
         } catch (Exception e) {
             return Error.error500(e);

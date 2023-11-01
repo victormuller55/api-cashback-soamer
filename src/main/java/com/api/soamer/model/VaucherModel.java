@@ -35,6 +35,9 @@ public class VaucherModel {
     @JsonProperty("trocado")
     private Integer trocado;
 
+    @JsonIgnore
+    private String imagePath;
+
     public VaucherModel() {
         descontoVaucher = 0;
         trocado = 0;
@@ -109,5 +112,13 @@ public class VaucherModel {
 
     public void setTrocado(Integer trocado) {
         this.trocado = trocado;
+    }
+
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
     }
 }

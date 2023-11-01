@@ -14,18 +14,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 
 @RestController
 @CrossOrigin(maxAge = 3600)
 @RequestMapping("/v1/soamer/usuario")
 public class UsuarioController {
-
     @Autowired
     UsuarioRepository usuarioRepository;
-
-
-
     @Autowired
     ConcessionariaRepository concessionariaRepository;
 
@@ -58,11 +55,21 @@ public class UsuarioController {
     }
 
     @GetMapping
-    public ResponseEntity<Object> entrarUsuario(@RequestParam(name = "email") String emailUsuario, @RequestParam String senha) {
+    public ResponseEntity<Object> entrarUsuario(@RequestParam(name = "email") String emailUsuario, @RequestParam String senha, @RequestParam(name = "nova_senha") String novaSenha) {
         try {
             if (Validators.emailValido(emailUsuario)) {
                 if (usuarioRepository.existsByEmailUsuario(emailUsuario)) {
+
                     UsuarioModel usuario = usuarioRepository.findByEmailUsuario(emailUsuario);
+
+                    if(senha.isEmpty() && novaSenha != "") {
+
+                        usuario.setSenhaUsuario(novaSenha);
+                        usuarioRepository.save(usuario);
+
+                        return Success.success200(usuario);
+                    }
+
                     if (usuario.getSenhaUsuario().toLowerCase(Locale.ROOT).equals(senha.toLowerCase(Locale.ROOT))) {
                         return Success.success200(usuario);
                     }
@@ -121,8 +128,6 @@ public class UsuarioController {
                     UsuarioModel usuario = usuarioRepository.findByEmailUsuario(editUsuarioModel.getEmail());
                     if (usuario.getSenhaUsuario().toLowerCase(Locale.ROOT).equals(editUsuarioModel.getSenha().toLowerCase(Locale.ROOT))) {
 
-                        Optional<ConcessionariaModel> concessionaria = concessionariaRepository.findById(editUsuarioModel.getIdConcessionaria());
-
                         if (!editUsuarioModel.getNewEmail().isEmpty()) {
                             usuario.setEmailUsuario(editUsuarioModel.getNewEmail());
                         }
@@ -139,13 +144,8 @@ public class UsuarioController {
                             usuario.setNomeUsuario(editUsuarioModel.getNome());
                         }
 
-                        if(concessionaria.isPresent()) {
-                            usuario.setIdConcessionaria(editUsuarioModel.getIdConcessionaria());
-                            usuario.setNomeConcessionaria(concessionaria.get().getNomeConcessionaria());
-                        }
-
                         usuarioRepository.save(usuario);
-                        return Success.success200(editUsuarioModel);
+                        return Success.success200(usuario);
                     }
 
                     return Error.error400("Senha incorreta");
