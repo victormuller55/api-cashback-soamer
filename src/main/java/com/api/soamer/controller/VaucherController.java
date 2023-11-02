@@ -9,9 +9,19 @@ import com.api.soamer.repository.VaucherRepository;
 import com.api.soamer.responses.Error;
 import com.api.soamer.responses.Success;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -22,18 +32,20 @@ import static com.api.soamer.util.Formatters.formatDDMMYYYYHHMMToDate;
 @RequestMapping("/v1/soamer/vaucher")
 public class VaucherController {
     @Autowired
-    VaucherRepository vaucherRepository;
+    VaucherRepository voucherRepository;
     @Autowired
     UsuarioRepository usuarioRepository;
     @Autowired
     ExtratoRepository extratoRepository;
 
     public VaucherController(VaucherRepository vaucherRepository, ExtratoRepository extratoRepository, UsuarioRepository usuarioRepository) {
-        this.vaucherRepository = vaucherRepository;
+        this.voucherRepository = vaucherRepository;
         this.extratoRepository = extratoRepository;
         this.usuarioRepository = usuarioRepository;
     }
-    private final String uploadDirectory = "img/voucher/";
+
+    @Value("${upload.path.voucher}")
+    private String uploadPathVoucher;
 
     @PostMapping
     public ResponseEntity<Object> createVaucher(@RequestBody VaucherModel vaucherModel) {
@@ -45,23 +57,8 @@ public class VaucherController {
             if (!vaucherModel.getTituloVaucher().isEmpty()) {
                 if (!vaucherModel.getInfoVaucher().isEmpty()) {
                     if (!vaucherModel.getPontosCheioVaucher().equals(0)) {
-
-//                        if (!file.isEmpty()) {
-//                            if (vaucherModel.getImagePath() != null) {
-//                                Path previousImagePath = Paths.get(uploadDirectory, vaucherModel.getImagePath());
-//                                Files.delete(previousImagePath);
-//                            }
-//
-//                            String fileName = "image" + "_voucher_" + file.getOriginalFilename();
-//                            Path filePath = Paths.get(uploadDirectory, fileName);
-//                            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-//                            vaucherModel.setImagePath(fileName);
-//                            vaucherRepository.save(vaucherModel);
-//                         }
-//                        return Error.error400("O arquivo está vazio");
-
                         vaucherModel.setPontosVaucher(vaucherModel.getPontosCheioVaucher() - vaucherModel.getDescontoVaucher());
-                        vaucherRepository.save(vaucherModel);
+                        voucherRepository.save(vaucherModel);
 
                         return Success.success200(vaucherModel);
 
@@ -79,11 +76,71 @@ public class VaucherController {
         }
     }
 
-    @PostMapping
-    public ResponseEntity<Object> postImageVoucher() {
+    @PostMapping(path = "/image")
+    public ResponseEntity<Object> postImageVoucher(@RequestParam("file") MultipartFile file, @RequestParam(name = "id_voucher") Integer idVoucher) {
         try {
-            return Success.success200("");
+            if (!file.isEmpty()) {
+                Optional<VaucherModel> voucherFinded = voucherRepository.findById(idVoucher);
+                if (voucherFinded.isPresent()) {
+
+                    VaucherModel voucherModel = voucherFinded.get();
+
+                    if (voucherModel.getImagePath() != null) {
+                        Path previousImagePath = Paths.get(uploadPathVoucher, voucherModel.getImagePath());
+                        Files.delete(previousImagePath);
+                    }
+
+                    String fileName = "image" + "_" + idVoucher + "_" + file.getOriginalFilename();
+                    Path filePath = Paths.get(uploadPathVoucher, fileName);
+                    Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+                    voucherModel.setImagePath(fileName);
+                    voucherRepository.save(voucherModel);
+                    return Success.success200("Ok");
+
+                } else {
+                    return Error.error400("Usuário não encontrado");
+                }
+            } else {
+                return Error.error400("O arquivo está vazio");
+            }
         } catch (Exception e) {
+            System.out.println(e);
+            return Error.error500(e);
+        }
+    }
+
+    @GetMapping(path = "/image")
+    public ResponseEntity<Object> getVoucherImage(@RequestParam(name = "id_voucher") Integer idVoucher) {
+        try {
+
+            Optional<VaucherModel> voucherFinded = voucherRepository.findById(idVoucher);
+
+            if (voucherFinded.isPresent()) {
+
+                VaucherModel voucher = voucherFinded.get();
+                String path = voucher.getImagePath();
+
+                if (path != null) {
+                    Path filePath = Paths.get(uploadPathVoucher, path);
+
+                    UrlResource resource = new UrlResource(filePath.toUri());
+
+                    if (resource.exists() && resource.isReadable()) {
+
+                        HttpHeaders headers = new HttpHeaders();
+                        headers.setContentType(MediaType.IMAGE_PNG);
+
+                        return ResponseEntity.ok().headers(headers).body(resource);
+                    } else {
+                        return Error.error400("Resourse não encontrada");
+                    }
+                } else {
+                    return Error.error400("Imagem não encontrada");
+                }
+            } else {
+                return Error.error400("Usuario não encontrado");
+            }
+        } catch (MalformedURLException e) {
             return Error.error500(e);
         }
     }
@@ -95,7 +152,7 @@ public class VaucherController {
             List<VaucherModel> vaucherEnviados = new ArrayList<>();
             Date dataAtual = new Date();
 
-            for (VaucherModel vaucher : vaucherRepository.findAll()) {
+            for (VaucherModel vaucher : voucherRepository.findAll()) {
                 if (dataAtual.toInstant().isAfter(vaucher.getDataComecoVaucher().toInstant()) && dataAtual.toInstant().isBefore(vaucher.getDataFinalVaucher().toInstant())) {
                     vaucherEnviados.add(vaucher);
                 }
@@ -116,7 +173,7 @@ public class VaucherController {
     public ResponseEntity<Object> descountVaucher(@RequestParam(name = "id") Integer id, @RequestParam(name = "desconto") Integer desconto) {
 
         try {
-            Optional<VaucherModel> vaucherFound = vaucherRepository.findById(id);
+            Optional<VaucherModel> vaucherFound = voucherRepository.findById(id);
 
             if (vaucherFound.isPresent()) {
 
@@ -125,13 +182,13 @@ public class VaucherController {
 
                 if (desconto > 0) {
                     vaucher.setPontosVaucher(vaucher.getPontosCheioVaucher() - desconto);
-                    vaucherRepository.save(vaucher);
+                    voucherRepository.save(vaucher);
 
                     return Success.success200(vaucher);
                 }
 
                 vaucher.setPontosVaucher(vaucher.getPontosCheioVaucher());
-                vaucherRepository.save(vaucher);
+                voucherRepository.save(vaucher);
 
                 return Success.success200(vaucher);
             }
@@ -150,7 +207,7 @@ public class VaucherController {
             List<VaucherModel> vaucherEnviados = new ArrayList<>();
             Date dataAtual = new Date();
 
-            for (VaucherModel vaucher : vaucherRepository.findAll()) {
+            for (VaucherModel vaucher : voucherRepository.findAll()) {
                 if (dataAtual.toInstant().isAfter(vaucher.getDataComecoVaucher().toInstant()) && dataAtual.toInstant().isBefore(vaucher.getDataFinalVaucher().toInstant())) {
                     if (vaucher.getDescontoVaucher() > 0) {
                         vaucherEnviados.add(vaucher);
@@ -175,7 +232,7 @@ public class VaucherController {
             List<VaucherModel> vaucherEnviados;
             Date dataAtual = new Date();
 
-            List<VaucherModel> vouchersValidos = vaucherRepository.findAll().stream()
+            List<VaucherModel> vouchersValidos = voucherRepository.findAll().stream()
                     .filter(vaucher -> dataAtual.toInstant().isAfter(vaucher.getDataComecoVaucher().toInstant()) && dataAtual.toInstant().isBefore(vaucher.getDataFinalVaucher().toInstant()))
                     .sorted(Comparator.comparingInt(VaucherModel::getTrocado).reversed()).toList();
 
@@ -198,7 +255,7 @@ public class VaucherController {
 
             if (idUsuario != null && idVaucher != null) {
 
-                Optional<VaucherModel> vaucherModel = vaucherRepository.findById(idVaucher);
+                Optional<VaucherModel> vaucherModel = voucherRepository.findById(idVaucher);
                 Optional<UsuarioModel> usuarioModel = usuarioRepository.findById(idUsuario);
 
                 if (vaucherModel.isPresent()) {
@@ -206,9 +263,7 @@ public class VaucherController {
                         if (usuarioModel.get().getPontosUsuario() >= vaucherModel.get().getPontosVaucher()) {
 
                             vaucherModel.get().setTrocado(vaucherModel.get().getTrocado() + 1);
-
                             usuarioModel.get().setPontosUsuario(usuarioModel.get().getPontosUsuario() - vaucherModel.get().getPontosVaucher());
-
                             usuarioRepository.save(usuarioModel.get());
                             extratoRepository.save(getExtratoModel(idUsuario, idVaucher, vaucherModel));
 

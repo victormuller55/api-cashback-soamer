@@ -67,4 +67,21 @@ public class Validators {
         return (digitoVerificador1 == Character.getNumericValue(cnpj.charAt(12)) &&
                 digitoVerificador2 == Character.getNumericValue(cnpj.charAt(13)));
     }
+
+
+    public static boolean isValidNfeNumber(String nfeNumber) {
+        if (nfeNumber == null || nfeNumber.isEmpty()) {
+            return false;
+        }
+
+        nfeNumber = nfeNumber.replaceAll("[^0-9]", "");
+
+        if (nfeNumber.length() != 44) {
+            return false;
+        }
+
+        Pattern pattern = Pattern.compile("^[0-9]{44}$");
+        Matcher matcher = pattern.matcher(nfeNumber);
+        return matcher.matches();
+    }
 }

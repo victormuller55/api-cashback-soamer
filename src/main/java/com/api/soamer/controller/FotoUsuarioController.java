@@ -46,11 +46,14 @@ public class FotoUsuarioController {
                 Optional<UsuarioModel> usuarioModelOptional = usuarioRepository.findById(idUsuario);
 
                 if (usuarioModelOptional.isPresent()) {
+
                     UsuarioModel usuarioModel = usuarioModelOptional.get();
 
                     if (usuarioModel.getImagePath() != null) {
-                        Path previousImagePath = Paths.get(uploadPath, usuarioModel.getImagePath());
-                        Files.delete(previousImagePath);
+                        if(!usuarioModel.getImagePath().equals("default_image.jpg")) {
+                            Path previousImagePath = Paths.get(uploadPath, usuarioModel.getImagePath());
+                            Files.delete(previousImagePath);
+                        }
                     }
 
                     String fileName = "image" + "_" + idUsuario + "_" + file.getOriginalFilename();
