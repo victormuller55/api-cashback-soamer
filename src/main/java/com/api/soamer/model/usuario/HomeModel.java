@@ -1,4 +1,4 @@
-package com.api.soamer.model;
+package com.api.soamer.model.usuario;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

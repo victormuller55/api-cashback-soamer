@@ -1,6 +1,6 @@
 package com.api.soamer.repository;
 
-import com.api.soamer.model.UsuarioModel;
+import com.api.soamer.model.usuario.UsuarioModel;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface UsuarioRepository extends JpaRepository<UsuarioModel, Integer> {

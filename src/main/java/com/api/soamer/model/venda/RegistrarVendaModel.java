@@ -1,4 +1,4 @@
-package com.api.soamer.model;
+package com.api.soamer.model.venda;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;

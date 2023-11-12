@@ -1,7 +1,7 @@
 package com.api.soamer.controller;
 
-import com.api.soamer.model.ConcessionariaModel;
-import com.api.soamer.model.UsuarioModel;
+import com.api.soamer.model.concessionaria.ConcessionariaModel;
+import com.api.soamer.model.usuario.UsuarioModel;
 import com.api.soamer.repository.ConcessionariaRepository;
 import com.api.soamer.repository.UsuarioRepository;
 import com.api.soamer.responses.Error;

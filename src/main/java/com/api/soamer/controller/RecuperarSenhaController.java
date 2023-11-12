@@ -1,6 +1,6 @@
 package com.api.soamer.controller;
 
-import com.api.soamer.model.UsuarioModel;
+import com.api.soamer.model.usuario.UsuarioModel;
 import com.api.soamer.repository.UsuarioRepository;
 import com.api.soamer.responses.Error;
 import com.api.soamer.responses.Success;

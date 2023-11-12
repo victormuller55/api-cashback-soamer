@@ -1,7 +1,6 @@
 package com.api.soamer.controller;
 
-import com.api.soamer.model.FotoUsuarioModel;
-import com.api.soamer.model.UsuarioModel;
+import com.api.soamer.model.usuario.UsuarioModel;
 import com.api.soamer.repository.FotoUsuarioRepository;
 import com.api.soamer.repository.UsuarioRepository;
 import com.api.soamer.responses.Error;
@@ -15,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;

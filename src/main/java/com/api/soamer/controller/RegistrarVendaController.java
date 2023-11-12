@@ -1,15 +1,14 @@
 package com.api.soamer.controller;
 
-import com.api.soamer.model.ExtratoModel;
-import com.api.soamer.model.RegistrarVendaModel;
-import com.api.soamer.model.UsuarioModel;
+import com.api.soamer.model.extrato.ExtratoModel;
+import com.api.soamer.model.venda.RegistrarVendaModel;
+import com.api.soamer.model.usuario.UsuarioModel;
 import com.api.soamer.repository.ExtratoRepository;
 import com.api.soamer.repository.RegistrarVendaRepository;
 import com.api.soamer.repository.UsuarioRepository;
 import com.api.soamer.repository.VaucherRepository;
 import com.api.soamer.responses.Error;
 import com.api.soamer.responses.Success;
-import com.api.soamer.util.Formatters;
 import com.api.soamer.util.Validators;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

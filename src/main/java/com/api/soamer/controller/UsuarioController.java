@@ -1,9 +1,8 @@
 package com.api.soamer.controller;
 
-import com.api.soamer.model.ConcessionariaModel;
-import com.api.soamer.model.EditUsuarioModel;
-import com.api.soamer.model.HomeModel;
-import com.api.soamer.model.UsuarioModel;
+import com.api.soamer.model.usuario.EditUsuarioModel;
+import com.api.soamer.model.usuario.HomeModel;
+import com.api.soamer.model.usuario.UsuarioModel;
 import com.api.soamer.repository.ConcessionariaRepository;
 import com.api.soamer.repository.UsuarioRepository;
 import com.api.soamer.responses.Error;
@@ -14,8 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Locale;
-import java.util.Objects;
-import java.util.Optional;
 
 @RestController
 @CrossOrigin(maxAge = 3600)
