@@ -1,4 +1,4 @@
-# API System | CashBoost
+# API System | Cashboost
 
 API CashBoost is a Java-based system developed to create REST APIs using Spring Boot for the CashBoost mobile application. It serves as the backend infrastructure for storing data and information related to the application's functionality.
 
