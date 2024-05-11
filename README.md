@@ -28,7 +28,26 @@ git clone https://github.com/victormuller55/api-cashboost.git
 
 2. Set Up the Environment: Ensure that you have Java, Spring Boot, and MySQL installed on your system.
 3. Configure the Application: Update the database configuration and other application properties as needed in the application.properties file.
-4. Build and Run the Application: Use Maven or your preferred build tool to build the application, then run it using the provided Maven or Spring Boot commands.
+
+```
+spring.application.name=your-name-aplication
+server.adress=your-ip-aplication
+server.port=your-port-aplication
+spring.datasource.url=your-database-url-aplication
+spring.datasource.username=your-username-aplication
+spring.datasource.password=your-password-aplication
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+spring.jpa.database-platform=org.hibernate.dialect.MySQL8Dialect
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.servlet.multipart.max-file-size=5MB
+spring.servlet.multipart.max-request-size=5MB
+spring.http.multipart.max-file-size=5MB
+spring.http.multipart.max-request-size=5MB
+
+```
+
+5. Build and Run the Application: Use Maven or your preferred build tool to build the application, then run it using the provided Maven or Spring Boot commands.
    
 ## Contact:
 For inquiries or further information about the API CashBoost system, you can reach out via email at victormuller050@gmail.com.
