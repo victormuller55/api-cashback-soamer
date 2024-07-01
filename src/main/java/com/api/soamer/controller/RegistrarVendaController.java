@@ -51,7 +51,7 @@ public class RegistrarVendaController {
                         if(usuarioModel.isPresent()) {
 
                             ExtratoModel extratoModel = getExtratoModel(registrarVendaModel.getIdUsuario());
-                            usuarioModel.get().setPontosUsuario(usuarioModel.get().getPontosUsuario() + 30);
+                            usuarioModel.get().setPontosPendentesUsuario(usuarioModel.get().getPontosPendentesUsuario() + 30);
 
                             usuarioRepository.save(usuarioModel.get());
                             extratoRepository.save(extratoModel);

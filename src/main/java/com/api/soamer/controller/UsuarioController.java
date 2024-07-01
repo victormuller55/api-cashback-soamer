@@ -7,17 +7,20 @@ import com.api.soamer.repository.ConcessionariaRepository;
 import com.api.soamer.repository.UsuarioRepository;
 import com.api.soamer.responses.Error;
 import com.api.soamer.responses.Success;
+import com.api.soamer.util.Formatters;
 import com.api.soamer.util.Validators;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Locale;
+import java.util.Objects;
 
 @RestController
 @CrossOrigin(maxAge = 3600)
 @RequestMapping("/v1/soamer/usuario")
 public class UsuarioController {
+
     @Autowired
     UsuarioRepository usuarioRepository;
     @Autowired
@@ -31,11 +34,12 @@ public class UsuarioController {
     @PostMapping
     public ResponseEntity<Object> createUsuario(@RequestBody UsuarioModel usuarioModel) {
         try {
-            if (Validators.emailValido(usuarioModel.getEmailUsuario())) {
+            if(Validators.emailValido(usuarioModel.getEmailUsuario())) {
                 if (!usuarioRepository.existsByEmailUsuario(usuarioModel.getEmailUsuario())) {
                     if (!usuarioRepository.existsByCpfUsuario(usuarioModel.getCpfUsuario())) {
                         usuarioModel.setImagePath("default_image.jpg");
                         usuarioRepository.save(usuarioModel);
+
                         return Success.success200(usuarioModel);
                     }
 
@@ -59,13 +63,16 @@ public class UsuarioController {
 
                     UsuarioModel usuario = usuarioRepository.findByEmailUsuario(emailUsuario);
 
-                    if(senha.isEmpty() && novaSenha != "") {
+                    if(senha.isEmpty() && !Objects.equals(novaSenha, "")) {
 
                         usuario.setSenhaUsuario(novaSenha);
                         usuarioRepository.save(usuario);
 
                         return Success.success200(usuario);
                     }
+
+                    System.out.println("SENHA USUARIO: " + senha);
+                    System.out.println("SENHA USUARIO DB: " + usuario.getSenhaUsuario());
 
                     if (usuario.getSenhaUsuario().toLowerCase(Locale.ROOT).equals(senha.toLowerCase(Locale.ROOT))) {
                         return Success.success200(usuario);

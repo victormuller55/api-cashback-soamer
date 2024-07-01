@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "tbl_concessionaria")
 public class ConcessionariaModel {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonProperty("id_concessionaria")

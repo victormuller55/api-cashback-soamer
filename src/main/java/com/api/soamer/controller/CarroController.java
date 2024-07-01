@@ -58,7 +58,7 @@ public class CarroController {
     @Value("${upload.path.carro}")
     private String uploadPath;
 
-    @PostMapping
+    @PostMapping(path="/foto")
     public ResponseEntity<Object> uploadFotoCarro(@RequestParam("file") MultipartFile file, @RequestParam(name = "id_carro") Integer idCarro) {
         try {
             if (!file.isEmpty()) {

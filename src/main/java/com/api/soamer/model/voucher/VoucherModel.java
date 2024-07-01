@@ -10,7 +10,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "tbl_vaucher")
-public class VaucherModel {
+public class VoucherModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonProperty("id_vaucher")
@@ -38,7 +38,7 @@ public class VaucherModel {
     @JsonIgnore
     private String imagePath;
 
-    public VaucherModel() {
+    public VoucherModel() {
         descontoVaucher = 0;
         trocado = 0;
     }

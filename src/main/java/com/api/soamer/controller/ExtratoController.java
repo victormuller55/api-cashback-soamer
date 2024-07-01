@@ -1,6 +1,7 @@
 package com.api.soamer.controller;
 
 import com.api.soamer.model.extrato.ExtratoModel;
+import com.api.soamer.model.usuario.UsuarioModel;
 import com.api.soamer.repository.ExtratoRepository;
 import com.api.soamer.repository.UsuarioRepository;
 import com.api.soamer.responses.Error;
@@ -10,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @CrossOrigin(maxAge = 3600)
@@ -36,6 +38,15 @@ public class ExtratoController {
             }
 
             return Error.error400("Usuario não encontrado");
+        } catch (Exception e) {
+            return Error.error500(e);
+        }
+    }
+
+    @GetMapping(path = "/todos")
+    public ResponseEntity<Object> extrato() {
+        try {
+            return Success.success200(extratoRepository.findAll());
         } catch (Exception e) {
             return Error.error500(e);
         }

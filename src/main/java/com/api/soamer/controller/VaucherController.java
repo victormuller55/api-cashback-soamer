@@ -1,11 +1,13 @@
 package com.api.soamer.controller;
 
 import com.api.soamer.model.extrato.ExtratoModel;
+import com.api.soamer.model.extrato.VouchersSolicitadosModel;
 import com.api.soamer.model.usuario.UsuarioModel;
-import com.api.soamer.model.voucher.VaucherModel;
+import com.api.soamer.model.voucher.VoucherModel;
 import com.api.soamer.repository.ExtratoRepository;
 import com.api.soamer.repository.UsuarioRepository;
 import com.api.soamer.repository.VaucherRepository;
+import com.api.soamer.repository.VouchersSolicitadosRepository;
 import com.api.soamer.responses.Error;
 import com.api.soamer.responses.Success;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,30 +39,34 @@ public class VaucherController {
     UsuarioRepository usuarioRepository;
     @Autowired
     ExtratoRepository extratoRepository;
+    @Autowired
+    VouchersSolicitadosRepository vouchersSolicitadosRepository;
 
-    public VaucherController(VaucherRepository vaucherRepository, ExtratoRepository extratoRepository, UsuarioRepository usuarioRepository) {
-        this.voucherRepository = vaucherRepository;
-        this.extratoRepository = extratoRepository;
+    public VaucherController(VaucherRepository voucherRepository, UsuarioRepository usuarioRepository, ExtratoRepository extratoRepository, VouchersSolicitadosRepository vouchersSolicitadosRepository) {
+        this.voucherRepository = voucherRepository;
         this.usuarioRepository = usuarioRepository;
+        this.extratoRepository = extratoRepository;
+        this.vouchersSolicitadosRepository = vouchersSolicitadosRepository;
     }
 
     @Value("${upload.path.voucher}")
     private String uploadPathVoucher;
 
     @PostMapping
-    public ResponseEntity<Object> createVaucher(@RequestBody VaucherModel vaucherModel) {
+    public ResponseEntity<Object> createVaucher(@RequestBody VoucherModel voucherModel) {
         try {
 
-            vaucherModel.setDataComecoVaucher(formatDDMMYYYYHHMMToDate(vaucherModel.getDataComecoVaucher().toString()));
-            vaucherModel.setDataFinalVaucher(formatDDMMYYYYHHMMToDate(vaucherModel.getDataFinalVaucher().toString()));
+            voucherModel.setDataComecoVaucher(formatDDMMYYYYHHMMToDate(voucherModel.getDataComecoVaucher().toString()));
+            voucherModel.setDataFinalVaucher(formatDDMMYYYYHHMMToDate(voucherModel.getDataFinalVaucher().toString()));
 
-            if (!vaucherModel.getTituloVaucher().isEmpty()) {
-                if (!vaucherModel.getInfoVaucher().isEmpty()) {
-                    if (!vaucherModel.getPontosCheioVaucher().equals(0)) {
-                        vaucherModel.setPontosVaucher(vaucherModel.getPontosCheioVaucher() - vaucherModel.getDescontoVaucher());
-                        voucherRepository.save(vaucherModel);
+            if (!voucherModel.getTituloVaucher().isEmpty()) {
+                if (!voucherModel.getInfoVaucher().isEmpty()) {
+                    if (!voucherModel.getPontosCheioVaucher().equals(0)) {
+                        voucherModel.setImagePath("default_image.jpg");
+                        voucherModel.setPontosVaucher(voucherModel.getPontosCheioVaucher() - voucherModel.getDescontoVaucher());
+                        voucherRepository.save(voucherModel);
 
-                        return Success.success200(vaucherModel);
+                        return Success.success200(voucherModel);
 
                     }
                     return Error.error400("PontosCheiosVaucher não deve ser 0");
@@ -80,12 +86,12 @@ public class VaucherController {
     public ResponseEntity<Object> postImageVoucher(@RequestParam("file") MultipartFile file, @RequestParam(name = "id_voucher") Integer idVoucher) {
         try {
             if (!file.isEmpty()) {
-                Optional<VaucherModel> voucherFinded = voucherRepository.findById(idVoucher);
+                Optional<VoucherModel> voucherFinded = voucherRepository.findById(idVoucher);
                 if (voucherFinded.isPresent()) {
 
-                    VaucherModel voucherModel = voucherFinded.get();
+                    VoucherModel voucherModel = voucherFinded.get();
 
-                    if (voucherModel.getImagePath() != null) {
+                    if (voucherModel.getImagePath() != null && !voucherModel.getImagePath().equals("default_image.jpg")) {
                         Path previousImagePath = Paths.get(uploadPathVoucher, voucherModel.getImagePath());
                         Files.delete(previousImagePath);
                     }
@@ -113,11 +119,11 @@ public class VaucherController {
     public ResponseEntity<Object> getVoucherImage(@RequestParam(name = "id_voucher") Integer idVoucher) {
         try {
 
-            Optional<VaucherModel> voucherFinded = voucherRepository.findById(idVoucher);
+            Optional<VoucherModel> voucherFinded = voucherRepository.findById(idVoucher);
 
             if (voucherFinded.isPresent()) {
 
-                VaucherModel voucher = voucherFinded.get();
+                VoucherModel voucher = voucherFinded.get();
                 String path = voucher.getImagePath();
 
                 if (path != null) {
@@ -149,10 +155,10 @@ public class VaucherController {
     public ResponseEntity<Object> getVaucherList() {
         try {
 
-            List<VaucherModel> vaucherEnviados = new ArrayList<>();
+            List<VoucherModel> vaucherEnviados = new ArrayList<>();
             Date dataAtual = new Date();
 
-            for (VaucherModel vaucher : voucherRepository.findAll()) {
+            for (VoucherModel vaucher : voucherRepository.findAll()) {
                 if (dataAtual.toInstant().isAfter(vaucher.getDataComecoVaucher().toInstant()) && dataAtual.toInstant().isBefore(vaucher.getDataFinalVaucher().toInstant())) {
                     vaucherEnviados.add(vaucher);
                 }
@@ -173,11 +179,11 @@ public class VaucherController {
     public ResponseEntity<Object> descountVaucher(@RequestParam(name = "id") Integer id, @RequestParam(name = "desconto") Integer desconto) {
 
         try {
-            Optional<VaucherModel> vaucherFound = voucherRepository.findById(id);
+            Optional<VoucherModel> vaucherFound = voucherRepository.findById(id);
 
             if (vaucherFound.isPresent()) {
 
-                VaucherModel vaucher = vaucherFound.get();
+                VoucherModel vaucher = vaucherFound.get();
                 vaucher.setDescontoVaucher(desconto);
 
                 if (desconto > 0) {
@@ -204,10 +210,10 @@ public class VaucherController {
     public ResponseEntity<Object> getVaucherListPromotion() {
         try {
 
-            List<VaucherModel> vaucherEnviados = new ArrayList<>();
+            List<VoucherModel> vaucherEnviados = new ArrayList<>();
             Date dataAtual = new Date();
 
-            for (VaucherModel vaucher : voucherRepository.findAll()) {
+            for (VoucherModel vaucher : voucherRepository.findAll()) {
                 if (dataAtual.toInstant().isAfter(vaucher.getDataComecoVaucher().toInstant()) && dataAtual.toInstant().isBefore(vaucher.getDataFinalVaucher().toInstant())) {
                     if (vaucher.getDescontoVaucher() > 0) {
                         vaucherEnviados.add(vaucher);
@@ -229,12 +235,12 @@ public class VaucherController {
     @GetMapping(path = "/trocados")
     public ResponseEntity<Object> getTop10VaucherTrocados() {
         try {
-            List<VaucherModel> vaucherEnviados;
+            List<VoucherModel> vaucherEnviados;
             Date dataAtual = new Date();
 
-            List<VaucherModel> vouchersValidos = voucherRepository.findAll().stream()
+            List<VoucherModel> vouchersValidos = voucherRepository.findAll().stream()
                     .filter(vaucher -> dataAtual.toInstant().isAfter(vaucher.getDataComecoVaucher().toInstant()) && dataAtual.toInstant().isBefore(vaucher.getDataFinalVaucher().toInstant()))
-                    .sorted(Comparator.comparingInt(VaucherModel::getTrocado).reversed()).toList();
+                    .sorted(Comparator.comparingInt(VoucherModel::getTrocado).reversed()).toList();
 
             vaucherEnviados = vouchersValidos.stream().limit(10).collect(Collectors.toList());
 
@@ -242,7 +248,7 @@ public class VaucherController {
                 return Success.success200(vaucherEnviados);
             }
 
-            return Error.error400("Não foi encontrado nenhum vaucher.");
+            return Success.success200(vaucherEnviados);
 
         } catch (Exception e) {
             return Error.error500(e);
@@ -255,7 +261,7 @@ public class VaucherController {
 
             if (idUsuario != null && idVaucher != null) {
 
-                Optional<VaucherModel> vaucherModel = voucherRepository.findById(idVaucher);
+                Optional<VoucherModel> vaucherModel = voucherRepository.findById(idVaucher);
                 Optional<UsuarioModel> usuarioModel = usuarioRepository.findById(idUsuario);
 
                 if (vaucherModel.isPresent()) {
@@ -263,7 +269,9 @@ public class VaucherController {
                         if (usuarioModel.get().getPontosUsuario() >= vaucherModel.get().getPontosVaucher()) {
 
                             vaucherModel.get().setTrocado(vaucherModel.get().getTrocado() + 1);
+
                             usuarioModel.get().setPontosUsuario(usuarioModel.get().getPontosUsuario() - vaucherModel.get().getPontosVaucher());
+                            vouchersSolicitadosRepository.save(getSolicitadosModel(vaucherModel, usuarioModel));
                             usuarioRepository.save(usuarioModel.get());
                             extratoRepository.save(getExtratoModel(idUsuario, idVaucher, vaucherModel));
 
@@ -283,16 +291,28 @@ public class VaucherController {
         }
     }
 
-    private static ExtratoModel getExtratoModel(Integer idUsuario, Integer idVaucher, Optional<VaucherModel> vaucherModel) {
+    private static VouchersSolicitadosModel getSolicitadosModel(Optional<VoucherModel> vaucherModel, Optional<UsuarioModel> usuarioModel) {
+        VouchersSolicitadosModel vouchersSolicitadosModel = new VouchersSolicitadosModel();
+
+        vouchersSolicitadosModel.setIdVoucher(vaucherModel.get().getIdVaucher());
+        vouchersSolicitadosModel.setIdUsuario(usuarioModel.get().getIdUsuario());
+        vouchersSolicitadosModel.setNomeUsuario(usuarioModel.get().getNomeUsuario());
+        vouchersSolicitadosModel.setTituloVoucher(vaucherModel.get().getTituloVaucher());
+        vouchersSolicitadosModel.setValor(vaucherModel.get().getPontosVaucher());
+        vouchersSolicitadosModel.setDataPedido(new Date());
+        vouchersSolicitadosModel.setEnviado(false);
+        return vouchersSolicitadosModel;
+    }
+
+    private static ExtratoModel getExtratoModel(Integer idUsuario, Integer idVaucher, Optional<VoucherModel> vaucherModel) {
         ExtratoModel extratoModel = new ExtratoModel();
-        extratoModel.setTituloExtrato("Troca por vaucher");
-        extratoModel.setDescricaoExtrato("Troca de pontos realizada - " + vaucherModel.get().getTituloVaucher());
+        extratoModel.setTituloExtrato("Troca por voucher");
+        extratoModel.setDescricaoExtrato("Voucher solicitado - " + vaucherModel.get().getTituloVaucher());
         extratoModel.setEntradaExtrato(false);
         extratoModel.setPontosExtrato(vaucherModel.get().getPontosVaucher());
         extratoModel.setDataExtrato(new Date());
         extratoModel.setIdUsuario(idUsuario);
-        extratoModel.setIdVaucher(idVaucher);
+        extratoModel.setIdVoucher(idVaucher);
         return extratoModel;
     }
-
 }

@@ -16,6 +16,8 @@ public class UsuarioModel {
     private String nomeUsuario;
     @JsonProperty("email_usuario")
     private String emailUsuario;
+    @JsonProperty("celular_usuario")
+    private String celularUsuario;
     @JsonProperty("cpf_usuario")
     private String cpfUsuario;
     @JsonProperty("pontos_usuario")
@@ -24,8 +26,6 @@ public class UsuarioModel {
     private int pontosPendentesUsuario;
     @JsonProperty("senha_usuario")
     private String senhaUsuario;
-    @JsonProperty("data_usuario")
-    private Date dataUsuario;
     @JsonProperty("id_concessionaria")
     private Integer idConcessionaria;
     @JsonProperty("nome_concessionaria")
@@ -34,7 +34,6 @@ public class UsuarioModel {
     private String imagePath;
 
     public UsuarioModel() {
-        dataUsuario = new Date();
         pontosUsuario = 0;
         pontosPendentesUsuario = 0;
     }
@@ -61,6 +60,14 @@ public class UsuarioModel {
 
     public void setEmailUsuario(String emailUsuario) {
         this.emailUsuario = emailUsuario;
+    }
+
+    public String getCelularUsuario() {
+        return celularUsuario;
+    }
+
+    public void setCelularUsuario(String celularUsuario) {
+        this.celularUsuario = celularUsuario;
     }
 
     public String getCpfUsuario() {
@@ -95,17 +102,10 @@ public class UsuarioModel {
         this.senhaUsuario = senhaUsuario;
     }
 
-    public Date getDataUsuario() {
-        return dataUsuario;
-    }
-
-    public void setDataUsuario(Date dataUsuario) {
-        this.dataUsuario = dataUsuario;
-    }
-
     public Integer getIdConcessionaria() {
         return idConcessionaria;
     }
+
     public void setIdConcessionaria(Integer idConcessionaria) {
         this.idConcessionaria = idConcessionaria;
     }

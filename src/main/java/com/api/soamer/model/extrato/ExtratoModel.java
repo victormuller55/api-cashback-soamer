@@ -1,5 +1,6 @@
 package com.api.soamer.model.extrato;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import java.util.Date;
@@ -17,6 +18,7 @@ public class ExtratoModel {
     private String descricaoExtrato;
     @JsonProperty("pontos_extrato")
     private Integer pontosExtrato;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss.SSSSSS")
     @JsonProperty("data_extrato")
     private Date dataExtrato;
     @JsonProperty("entrada_extrato")
@@ -86,7 +88,7 @@ public class ExtratoModel {
         return idVaucher;
     }
 
-    public void setIdVaucher(Integer idVaucher) {
+    public void setIdVoucher(Integer idVaucher) {
         this.idVaucher = idVaucher;
     }
 }
