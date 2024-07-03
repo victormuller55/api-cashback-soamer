@@ -2,7 +2,6 @@ package com.api.soamer.controller;
 
 import com.api.soamer.model.extrato.ExtratoModel;
 import com.api.soamer.model.extrato.VouchersSolicitadosModel;
-import com.api.soamer.model.voucher.VoucherModel;
 import com.api.soamer.repository.ExtratoRepository;
 import com.api.soamer.repository.UsuarioRepository;
 import com.api.soamer.repository.VouchersSolicitadosRepository;
